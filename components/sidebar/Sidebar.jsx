@@ -34,11 +34,11 @@ export default function Sidebar() {
       <Typography variant="h5" component={ListItem} marginTop={"10px"}>
         Messages
       </Typography>
-      <Divider />
+      <Divider color="white" />
       <List sx={{ width: "20rem" }}>
         {names.map((name) => (
           <ListItemButton>
-            <Avatar sx={{ marginRight: "10px" }} /> {name}
+            <Avatar sx={{ marginRight: "1px" }} /> {name}
           </ListItemButton>
         ))}
       </List>

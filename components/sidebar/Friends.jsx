@@ -1,3 +1,4 @@
+"use client";
 import { ArrowBack } from "@mui/icons-material";
 import {
   Avatar,
@@ -7,25 +8,50 @@ import {
   IconButton,
   List,
   ListItemButton,
+  Typography,
 } from "@mui/material";
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 import { names } from "./data";
 import Link from "next/link";
+import { getUserList } from "@/api/users/getUserList";
 
 export default function Friends() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const token = localStorage.getItem("token");
+      console.log("Token:", token);
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+      const users = await getUserList(token);
+      setUsers(users?.data);
+      console.log(users?.data);
+    };
+    fetchUsers().catch((error) => {
+      console.error("Error fetching user list:", error);
+    });
+  }, []);
+
   return (
     <Box borderRight="solid 1px white" height={"88vh"} overflow={"scroll"}>
       <IconButton sx={{ height: "4rem" }}>
         <ArrowBack color="white" />
+        <Typography variant="h5" color="white" marginLeft={"10px"}>
+          Messages
+        </Typography>
       </IconButton>
-      <Divider />
+      <Divider color="gray" />
       <List>
-        {names.map((name) => (
+        {users.map((user) => (
           <ListItemButton
             LinkComponent={Link}
-            href={`/messages/${name.split(" ")[0]}`}
+            href={`/messages/${user._id}`}
+            id={user._id}
+            key={user._id}
           >
-            <Avatar sx={{ marginRight: "10px" }} /> {name}
+            <Avatar sx={{ marginRight: "10px" }} /> {user.username}
           </ListItemButton>
         ))}
       </List>

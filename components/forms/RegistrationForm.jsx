@@ -4,11 +4,14 @@ import { Formik, Form } from "formik";
 import { Button, TextField, Box, Typography, useTheme } from "@mui/material";
 import { validateSchema } from "@/utils/validation";
 import { registerUser } from "@/api/auth/registration";
+import { useRouter } from "next/navigation";
 
 const { registrationSchema } = validateSchema();
 
 const RegistrationForm = () => {
   const theme = useTheme();
+  const { login } = useAuth();
+  const router = useRouter();
 
   return (
     <Formik
@@ -20,12 +23,13 @@ const RegistrationForm = () => {
       }}
       validationSchema={registrationSchema}
       onSubmit={(values, { setSubmitting, resetForm }) => {
-        // Handle form submission here
         alert(JSON.stringify(values, null, 2));
         console.log("Form submitted:", values);
         registerUser(values)
           .then((response) => {
             console.log("Registration successful:", response);
+            login(response);
+            router.push("/");
           })
           .catch((error) => {
             console.error("Registration error:", error);

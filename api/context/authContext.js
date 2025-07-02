@@ -1,5 +1,8 @@
 "use client";
-const { createContext, useContext, useState } = require("react");
+
+import { jwtDecode } from "jwt-decode";
+
+const { createContext, useContext, useState, useEffect } = require("react");
 
 const AuthContext = createContext();
 
@@ -7,11 +10,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const token = localStorage.getItem("token");
-  console.log("Token:", token);
-  if (!token) {
-    throw new Error("No authentication token found");
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      console.log(token);
+      const decodedUser = jwtDecode(token);
+      if (!decodedUser) {
+        return;
+      }
+      setUser(decodedUser);
+      console.log(decodedUser);
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const login = (userData) => {
     setUser(userData);

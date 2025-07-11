@@ -1,23 +1,26 @@
 "use client";
-import { getMessageList } from "@/api/message/getMessages";
-import { sendMessage } from "@/api/message/sendMessage";
+import { getMessageList } from "@/hooks/message/getMessages";
+import { sendMessage } from "@/hooks/message/sendMessage";
 import { Send, Toc } from "@mui/icons-material";
 import {
   Avatar,
   Box,
-  Button,
   Grid,
   IconButton,
   TextField,
   Typography,
 } from "@mui/material";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
+import { sendHandler } from "./utils";
 
 export default function Messages() {
   const params = useParams();
   const [message, setMessage] = useState("");
   const [messagesSend, setMessagesSend] = useState(null);
+  const [messagesReceived, setMessagesReceived] = useState(null);
+
   useEffect(() => {
     const getMessages = async () => {
       const token = localStorage.getItem("token");
@@ -25,32 +28,16 @@ export default function Messages() {
         console.error("No token found in localStorage");
         return;
       }
-      console.log("Fetching messages for user:", token);
       const response = await getMessageList(params?.userId, token);
       setMessagesSend(response?.messagesSend?.messages);
+      setMessagesReceived(response?.messagesReceived?.messages);
+      console.log("Messages fetched:", response);
       return;
     };
     getMessages().catch((error) => {
       console.error("Error fetching messages:", error);
     });
   }, []);
-
-  const sendHandler = async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found in localStorage");
-      return;
-    }
-    await sendMessage(message, params?.userId, token)
-      .then((response) => {
-        console.log("response");
-      })
-      .catch((error) => {
-        console.error("Error sending message:", error);
-      });
-  };
 
   return (
     <Grid size={9} height={"88vh"}>
@@ -86,14 +73,19 @@ export default function Messages() {
             },
           }}
         >
-          <Box
-            sx={{
-              bgcolor: "blueviolet",
-              color: "white",
-            }}
-          >
-            <Typography>Hi, how are you?</Typography>
-          </Box>
+          {messagesReceived?.map((message, index) => {
+            return (
+              <Box
+                sx={{
+                  bgcolor: "blueviolet",
+                  color: "white",
+                }}
+                key={index}
+              >
+                <Typography>{message?.message}</Typography>
+              </Box>
+            );
+          })}
           {messagesSend?.map((message, index) => {
             return (
               <Box
@@ -127,6 +119,7 @@ export default function Messages() {
             input: { color: "white" },
           }}
           fullWidth
+          id="message"
           onChange={(e) => setMessage(e.target.value)}
         />
         <IconButton

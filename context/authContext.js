@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       setUser(decodedUser);
-      console.log(decodedUser);
       setIsAuthenticated(true);
     }
   }, []);

@@ -13,18 +13,13 @@ import {
 import React, { use, useEffect, useState } from "react";
 import { names } from "./data";
 import Link from "next/link";
-import { getUserList } from "@/api/users/getUserList";
+import { getUserList } from "@/hooks/users/getUserList";
 
 export default function Friends() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem("token");
-      console.log("Token:", token);
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
       const users = await getUserList(token);
       setUsers(users?.data);
       console.log(users?.data);

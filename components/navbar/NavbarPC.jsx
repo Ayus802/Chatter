@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import React from "react";
-import { useAuth } from "@/api/context/authContext";
+import { useAuth } from "@/context/authContext";
 
 export default function NavbarPC() {
   const { isAuthenticated, user } = useAuth();

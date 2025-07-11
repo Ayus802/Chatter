@@ -13,8 +13,8 @@ import {
   Container,
 } from "@mui/material";
 import { validateSchema } from "@/utils/validation";
-import loginUser from "@/api/auth/login";
-import { useAuth } from "@/api/context/authContext";
+import loginUser from "@/hooks/auth/login";
+import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 
 const { loginSchema } = validateSchema();
@@ -44,7 +44,6 @@ export default function LoginForm() {
           alert(JSON.stringify(values, null, 2));
           loginUser(values)
             .then((response) => {
-              console.log("Login successful:", response);
               login(response);
               router.push("/");
             })

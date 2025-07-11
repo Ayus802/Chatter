@@ -3,7 +3,7 @@ import React from "react";
 import { Formik, Form } from "formik";
 import { Button, TextField, Box, Typography, useTheme } from "@mui/material";
 import { validateSchema } from "@/utils/validation";
-import { registerUser } from "@/api/auth/registration";
+import { registerUser } from "@/hooks/auth/registration";
 import { useRouter } from "next/navigation";
 
 const { registrationSchema } = validateSchema();
@@ -27,7 +27,6 @@ const RegistrationForm = () => {
         console.log("Form submitted:", values);
         registerUser(values)
           .then((response) => {
-            console.log("Registration successful:", response);
             login(response);
             router.push("/");
           })

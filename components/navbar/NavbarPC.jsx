@@ -5,15 +5,16 @@ import {
   Box,
   Grid,
   IconButton,
+  Link,
   Toolbar,
   Typography,
 } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import React from "react";
-import { useAuth } from "@/api/context/authContext";
+import { useAuth } from "@/context/authContext";
 
 export default function NavbarPC() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <Box flexGrow={1} zIndex={100}>
@@ -38,18 +39,29 @@ export default function NavbarPC() {
               <Typography variant="h6" fontSize={"1rem"}>
                 {user?.name}
               </Typography>
+              <Link
+                href="/login"
+                onClick={logout}
+                style={{
+                  textDecoration: "none",
+                  color: "white",
+                  marginLeft: "20px",
+                }}
+              >
+                Lougout
+              </Link>
             </>
           ) : (
             <Grid container spacing={2} justifyContent="flex-end">
               <Grid item>
-                <Typography variant="body1" color="white">
+                <Link href="/login" style={{ textDecoration: "none" }}>
                   Sign In
-                </Typography>
+                </Link>
               </Grid>
               <Grid item>
-                <Typography variant="body1" color="white">
+                <Link href="/signup" style={{ textDecoration: "none" }}>
                   Sign Up
-                </Typography>
+                </Link>
               </Grid>
             </Grid>
           )}

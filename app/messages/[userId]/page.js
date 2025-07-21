@@ -1,7 +1,18 @@
 "use client";
 import { getMessageList } from "@/api/message/getMessages";
 import { sendMessage } from "@/api/message/sendMessage";
-import { Send, Toc } from "@mui/icons-material";
+import { useReceiveMessage } from "@/api/message/useReceiveMessage";
+import { useAuth } from "@/context/authContext";
+import {
+  CallEndOutlined,
+  CallOutlined,
+  Send,
+  Toc,
+  VideoCall,
+  VideoCallOutlined,
+  VideoCallRounded,
+  VideoCallSharp,
+} from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -12,40 +23,45 @@ import {
   Typography,
 } from "@mui/material";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Messages() {
   const params = useParams();
   const [message, setMessage] = useState("");
-  const [messagesSend, setMessagesSend] = useState(null);
+  const [allMessages, setAllMessages] = useState([]);
+
+  const { token, user } = useAuth();
+  useReceiveMessage(setAllMessages);
   useEffect(() => {
     const getMessages = async () => {
-      const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found in localStorage");
+        toast("No token found in localStorage");
         return;
       }
-      console.log("Fetching messages for user:", token);
       const response = await getMessageList(params?.userId, token);
-      setMessagesSend(response?.messagesSend?.messages);
+      console.log("Fetching messages for user:", response);
+
+      setAllMessages(response?.allMessages || []);
       return;
     };
     getMessages().catch((error) => {
       console.error("Error fetching messages:", error);
     });
-  }, []);
+  }, [token, params?.userId]);
 
   const sendHandler = async (e) => {
     e.preventDefault();
-
-    const token = localStorage.getItem("token");
     if (!token) {
       console.error("No token found in localStorage");
       return;
     }
+    console.log("Sending message:", message);
     await sendMessage(message, params?.userId, token)
       .then((response) => {
-        console.log("response");
+        setAllMessages((prev) => [...prev, { message, senderId: user?.id }]);
+        console.log("check", user);
+        setMessage("");
       })
       .catch((error) => {
         console.error("Error sending message:", error);
@@ -67,6 +83,12 @@ export default function Messages() {
           {params?.userId}
         </Typography>
         <IconButton>
+          <CallOutlined sx={{ color: "white" }} />
+        </IconButton>
+        <IconButton>
+          <IconButton>
+            <VideoCallRounded sx={{ color: "white" }} />
+          </IconButton>
           <Toc sx={{ color: "white" }} />
         </IconButton>
       </Grid>
@@ -86,15 +108,28 @@ export default function Messages() {
             },
           }}
         >
-          <Box
-            sx={{
-              bgcolor: "blueviolet",
-              color: "white",
-            }}
-          >
-            <Typography>Hi, how are you?</Typography>
-          </Box>
+          {allMessages?.map((message, index) => {
+            // console.log(messagesReceive);
+
+            return (
+              <Box
+                key={index}
+                sx={{
+                  bgcolor:
+                    message?.senderId === user?.id ? "gray" : "blueviolet",
+                  color: "white",
+                  alignSelf:
+                    message?.senderId === user?.id ? "flex-end" : "flex-start",
+                }}
+              >
+                <Typography key={index}>{message?.message}</Typography>
+                <Typography fontSize={".5rem"}>{message?.createdAt}</Typography>
+              </Box>
+            );
+          })}
+          {/*
           {messagesSend?.map((message, index) => {
+            console.log(messagesSend);
             return (
               <Box
                 sx={{
@@ -103,11 +138,10 @@ export default function Messages() {
                   alignSelf: "flex-end",
                 }}
               >
-                {console.log(message.message)}
                 <Typography key={index}>{message?.message}</Typography>
               </Box>
             );
-          })}
+          })} */}
         </Box>
       </Grid>
       <Grid
@@ -127,6 +161,7 @@ export default function Messages() {
             input: { color: "white" },
           }}
           fullWidth
+          value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
         <IconButton

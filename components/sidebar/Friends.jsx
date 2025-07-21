@@ -10,29 +10,32 @@ import {
   ListItemButton,
   Typography,
 } from "@mui/material";
-import React, { use, useEffect, useState } from "react";
-import { names } from "./data";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getUserList } from "@/api/users/getUserList";
+import { useAuth } from "@/context/authContext";
+import { toast } from "react-toastify";
 
 export default function Friends() {
   const [users, setUsers] = useState([]);
-
+  const { token, setIsAuthenticated, isAuthenticated } = useAuth();
   useEffect(() => {
+    if (!token) {
+      return;
+    }
     const fetchUsers = async () => {
-      const token = localStorage.getItem("token");
-      console.log("Token:", token);
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
+      console.log("Fetching user list with token:", token);
       const users = await getUserList(token);
       setUsers(users?.data);
       console.log(users?.data);
     };
     fetchUsers().catch((error) => {
-      console.error("Error fetching user list:", error);
+      console.error("Error aa rha:", error);
+      toast.error("Please login again");
+      sessionStorage.removeItem("token");
+      setIsAuthenticated(false);
     });
-  }, []);
+  }, [token, isAuthenticated, setIsAuthenticated]);
 
   return (
     <Box borderRight="solid 1px white" height={"88vh"} overflow={"scroll"}>

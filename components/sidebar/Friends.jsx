@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getUserList } from "@/api/users/getUserList";
 import { useAuth } from "@/context/authContext";
 import { toast } from "react-toastify";
+import { getUserList } from "@/hooks/users/useGetUserList";
 
 export default function Friends() {
   const [users, setUsers] = useState([]);

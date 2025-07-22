@@ -1,7 +1,7 @@
 "use client";
-import { getMessageList } from "@/api/message/getMessages";
-import { sendMessage } from "@/api/message/sendMessage";
-import { useReceiveMessage } from "@/api/message/useReceiveMessage";
+import { getMessageList } from "@/hooks/message/useGetMessages";
+import { sendMessage } from "@/hooks/message/useSendMessage";
+import { useReceiveMessage } from "@/hooks/message/useReceiveMessage";
 import { useAuth } from "@/context/authContext";
 import {
   CallEndOutlined,

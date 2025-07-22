@@ -19,10 +19,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       setUser(decodedUser);
-<<<<<<<< HEAD:context/authContext.jsx
       setToken(storedToken);
-========
->>>>>>>> c707f17845248f5df069fde51f844f7189a4721c:context/authContext.js
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);

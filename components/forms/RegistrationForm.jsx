@@ -4,8 +4,8 @@ import { Formik, Form } from "formik";
 import { Button, TextField, Box, Typography, useTheme } from "@mui/material";
 import { validateSchema } from "@/utils/validation";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/authContext";
 import { registerUser } from "@/api/auth/registration";
+import { useAuth } from "@/context/authContext";
 
 const { registrationSchema } = validateSchema();
 

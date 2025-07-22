@@ -85,9 +85,9 @@ export default function Messages() {
           <CallOutlined sx={{ color: "white" }} />
         </IconButton>
         <IconButton>
-          <IconButton>
-            <VideoCallRounded sx={{ color: "white" }} />
-          </IconButton>
+          <VideoCallRounded sx={{ color: "white" }} />
+        </IconButton>
+        <IconButton>
           <Toc sx={{ color: "white" }} />
         </IconButton>
       </Grid>

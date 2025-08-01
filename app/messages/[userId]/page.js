@@ -1,5 +1,18 @@
 "use client";
-import { Send, Toc } from "@mui/icons-material";
+import { getMessageList } from "@/hooks/message/useGetMessages";
+import { sendMessage } from "@/hooks/message/useSendMessage";
+import { useReceiveMessage } from "@/hooks/message/useReceiveMessage";
+import { useAuth } from "@/context/authContext";
+import {
+  CallEndOutlined,
+  CallOutlined,
+  Send,
+  Toc,
+  VideoCall,
+  VideoCallOutlined,
+  VideoCallRounded,
+  VideoCallSharp,
+} from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -9,34 +22,50 @@ import {
   Typography,
 } from "@mui/material";
 import { useParams } from "next/navigation";
-import { use, useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
-import { sendHandler } from "./utils";
-import { getMessageList } from "@/hooks/message/useGetMessages";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Messages() {
   const params = useParams();
   const [message, setMessage] = useState("");
-  const [messagesSend, setMessagesSend] = useState(null);
-  const [messagesReceived, setMessagesReceived] = useState(null);
+  const [allMessages, setAllMessages] = useState([]);
 
+  const { token, user } = useAuth();
+  useReceiveMessage(setAllMessages);
   useEffect(() => {
     const getMessages = async () => {
-      const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found in localStorage");
+        toast("No token found in localStorage");
         return;
       }
       const response = await getMessageList(params?.userId, token);
-      setMessagesSend(response?.messagesSend?.messages);
-      setMessagesReceived(response?.messagesReceived?.messages);
-      console.log("Messages fetched:", response);
+      console.log("Fetching messages for user:", response);
+
+      setAllMessages(response?.allMessages || []);
       return;
     };
     getMessages().catch((error) => {
       console.error("Error fetching messages:", error);
     });
-  }, []);
+  }, [token, params?.userId]);
+
+  const sendHandler = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+    }
+    console.log("Sending message:", message);
+    await sendMessage(message, params?.userId, token)
+      .then((response) => {
+        setAllMessages((prev) => [...prev, { message, senderId: user?.id }]);
+        console.log("check", user);
+        setMessage("");
+      })
+      .catch((error) => {
+        console.error("Error sending message:", error);
+      });
+  };
 
   return (
     <Grid size={9} height={"88vh"}>
@@ -52,6 +81,12 @@ export default function Messages() {
         <Typography marginLeft={"10px"} flexGrow={1}>
           {params?.userId}
         </Typography>
+        <IconButton>
+          <CallOutlined sx={{ color: "white" }} />
+        </IconButton>
+        <IconButton>
+          <VideoCallRounded sx={{ color: "white" }} />
+        </IconButton>
         <IconButton>
           <Toc sx={{ color: "white" }} />
         </IconButton>
@@ -72,20 +107,28 @@ export default function Messages() {
             },
           }}
         >
-          {messagesReceived?.map((message, index) => {
+          {allMessages?.map((message, index) => {
+            // console.log(messagesReceive);
+
             return (
               <Box
-                sx={{
-                  bgcolor: "blueviolet",
-                  color: "white",
-                }}
                 key={index}
+                sx={{
+                  bgcolor:
+                    message?.senderId === user?.id ? "gray" : "blueviolet",
+                  color: "white",
+                  alignSelf:
+                    message?.senderId === user?.id ? "flex-end" : "flex-start",
+                }}
               >
-                <Typography>{message?.message}</Typography>
+                <Typography key={index}>{message?.message}</Typography>
+                <Typography fontSize={".5rem"}>{message?.createdAt}</Typography>
               </Box>
             );
           })}
+          {/*
           {messagesSend?.map((message, index) => {
+            console.log(messagesSend);
             return (
               <Box
                 sx={{
@@ -94,11 +137,10 @@ export default function Messages() {
                   alignSelf: "flex-end",
                 }}
               >
-                {console.log(message.message)}
                 <Typography key={index}>{message?.message}</Typography>
               </Box>
             );
-          })}
+          })} */}
         </Box>
       </Grid>
       <Grid
@@ -114,11 +156,10 @@ export default function Messages() {
           placeholder="Message"
           sx={{
             border: "solid white 1px",
-            borderRadius: "2rem",
             input: { color: "white" },
           }}
           fullWidth
-          id="message"
+          value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
         <IconButton

@@ -16,10 +16,11 @@ import { validateSchema } from "@/utils/validation";
 import loginUser from "@/hooks/auth/useLogin";
 import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
-
-const { loginSchema } = validateSchema();
+import { toast } from "react-toastify";
+import loginUser from "@/hooks/auth/useLogin";
 
 export default function LoginForm() {
+  const { loginSchema } = validateSchema();
   const { login } = useAuth();
   const router = useRouter();
 
@@ -40,16 +41,19 @@ export default function LoginForm() {
           rememberMe: false,
         }}
         validationSchema={loginSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          alert(JSON.stringify(values, null, 2));
-          loginUser(values)
+        onSubmit={async (values, { setSubmitting, resetForm }) => {
+          await loginUser(values)
             .then((response) => {
               login(response);
-              router.push("/");
+              toast.success("Login successful!");
+              router.push("/messages");
             })
             .catch((error) => {
-              console.error("Login error:", error);
-              alert("Login failed. Please check your credentials.");
+              toast.error("Login failed. Please check your credentials.");
+            })
+            .finally(() => {
+              setSubmitting(false);
+              resetForm();
             });
 
           setSubmitting(false);

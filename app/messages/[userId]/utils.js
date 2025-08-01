@@ -1,16 +1,24 @@
-export const sendHandler = async (e) => {
-  e.preventDefault();
+const { useSocket } = require("@/context/socketContext");
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("No token found in localStorage");
-    return;
-  }
-  await sendMessage(message, params?.userId, token)
-    .then((response) => {
-      console.log("response");
-    })
-    .catch((error) => {
-      console.error("Error sending message:", error);
-    });
-};
+async function MakeVideoCall(userId) {
+  const { socket } = useSocket();
+  const pc = new RTCPeerConnection();
+  const offer = await pc.createAnswer();
+  pc.setLocalDescription(offer);
+  socket.to(userId).emit("video-call", { offer });
+  await socket.on("video-call-accepted", async ({ answer }) => {
+    await pc.setRemoteDescription(answer);
+    console.log("Video call accepted", answer);
+  });
+}
+
+async function AcceptVideoCall(userId, offer) {
+  const { socket } = useSocket();
+  socket.on("video-call", async ({ offer }) => {
+    const pc = new RTCPeerConnection();
+    pc.setRemoteDescription(offer);
+    const answer = await pc.createAnswer();
+    pc.setLocalDescription(answer);
+    socket.to(userId).emit("video-call-accepted", { answer });
+  });
+}

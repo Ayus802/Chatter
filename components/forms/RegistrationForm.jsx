@@ -3,8 +3,9 @@ import React from "react";
 import { Formik, Form } from "formik";
 import { Button, TextField, Box, Typography, useTheme } from "@mui/material";
 import { validateSchema } from "@/utils/validation";
-import { registerUser } from "@/hooks/auth/registration";
 import { useRouter } from "next/navigation";
+import { registerUser } from "@/api/auth/registration";
+import { useAuth } from "@/context/authContext";
 
 const { registrationSchema } = validateSchema();
 
@@ -22,10 +23,10 @@ const RegistrationForm = () => {
         confirmPassword: "",
       }}
       validationSchema={registrationSchema}
-      onSubmit={(values, { setSubmitting, resetForm }) => {
+      onSubmit={async (values, { setSubmitting, resetForm }) => {
         alert(JSON.stringify(values, null, 2));
         console.log("Form submitted:", values);
-        registerUser(values)
+        await registerUser(values)
           .then((response) => {
             login(response);
             router.push("/");

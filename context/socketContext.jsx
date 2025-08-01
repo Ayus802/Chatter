@@ -1,14 +1,15 @@
 "use client";
-const { createContext, useContext, useState, useEffect } = require("react");
-const { io } = require("socket.io-client");
-const { useAuth } = require("./authContext");
+import { createContext, useContext, useState, useEffect } from "react";
+import { io } from "socket.io-client";
+import { toast } from "react-toastify";
+import { useAuth } from "./authContext";
 
-const socketContext = createContext();
+const SocketContext = createContext();
 
 export const useSocket = () => {
-  const context = useContext(socketContext);
+  const context = useContext(SocketContext);
   if (!context) {
-    throw new Error("useSocket must be used within a SocketContextProvider");
+    return;
   }
   return context;
 };
@@ -19,8 +20,11 @@ export const SocketContextProvider = ({ children }) => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+    if (!user) return;
+    console.log("Connecting to socket server with user:", user);
+    const newSocket = io("http://localhost:8080", {
       transports: ["websocket"],
+      query: { userId: user?.id },
     });
     setSocket(newSocket);
 
@@ -42,8 +46,8 @@ export const SocketContextProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <socketContext.Provider value={{ socket, onlineUsers }}>
+    <SocketContext.Provider value={{ socket, onlineUsers }}>
       {children}
-    </socketContext.Provider>
+    </SocketContext.Provider>
   );
 };

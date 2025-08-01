@@ -156,7 +156,6 @@ export default function Messages() {
           placeholder="Message"
           sx={{
             border: "solid white 1px",
-            borderRadius: "2rem",
             input: { color: "white" },
           }}
           fullWidth

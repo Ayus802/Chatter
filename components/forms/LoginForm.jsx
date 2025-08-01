@@ -13,7 +13,7 @@ import {
   Container,
 } from "@mui/material";
 import { validateSchema } from "@/utils/validation";
-import loginUser from "@/hooks/auth/login";
+import loginUser from "@/hooks/auth/useLogin";
 import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 

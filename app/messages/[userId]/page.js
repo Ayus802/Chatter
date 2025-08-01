@@ -1,6 +1,4 @@
 "use client";
-import { getMessageList } from "@/hooks/message/getMessages";
-import { sendMessage } from "@/hooks/message/sendMessage";
 import { Send, Toc } from "@mui/icons-material";
 import {
   Avatar,
@@ -14,6 +12,7 @@ import { useParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import { sendHandler } from "./utils";
+import { getMessageList } from "@/hooks/message/useGetMessages";
 
 export default function Messages() {
   const params = useParams();

@@ -13,7 +13,7 @@ import {
 import React, { use, useEffect, useState } from "react";
 import { names } from "./data";
 import Link from "next/link";
-import { getUserList } from "@/hooks/users/getUserList";
+import { getUserList } from "@/hooks/users/useGetUserList";
 
 export default function Friends() {
   const [users, setUsers] = useState([]);

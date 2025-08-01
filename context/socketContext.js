@@ -1,4 +1,5 @@
-const { createContext, useContext } = require("react");
+"use client";
+const { createContext, useContext, useState, useEffect } = require("react");
 const { io } = require("socket.io-client");
 const { useAuth } = require("./authContext");
 

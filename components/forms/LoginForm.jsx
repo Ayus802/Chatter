@@ -17,7 +17,6 @@ import loginUser from "@/hooks/auth/useLogin";
 import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import loginUser from "@/hooks/auth/useLogin";
 
 export default function LoginForm() {
   const { loginSchema } = validateSchema();
